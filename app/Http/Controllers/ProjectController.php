@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProjectCollaboratorAdd;
 use App\Project;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -9,6 +10,20 @@ use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
+
+    /**
+     * @param Project $projects
+     * @param ProjectCollaboratorAdd $request
+     * @return Project
+     */
+    public function addCollaborator(Project $projects, ProjectCollaboratorAdd $request) {
+
+        $projects->users()->attach($request->user_id);
+
+        return $projects->load(['users']);
+
+    }
+
     /**
      * Display a listing of the resource.
      *

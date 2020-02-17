@@ -17,3 +17,5 @@ Route::get('/', function () {
 
 Route::resource('users', 'UserController');
 Route::resource('projects', 'ProjectController');
+
+Route::post('projects/{projects}/user', 'ProjectController@addCollaborator');
