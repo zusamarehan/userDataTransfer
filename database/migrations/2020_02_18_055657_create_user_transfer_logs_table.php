@@ -18,11 +18,8 @@ class CreateUserTransferLogsTable extends Migration
 
             $table->string('module', 100);
             $table->integer('module_id');
-            $table->unsignedBigInteger('from_user_id');
-            $table->unsignedBigInteger('to_user_id');
-
-            $table->foreign('from_user_id')->references('id')->on('users');
-            $table->foreign('to_user_id')->references('id')->on('users');
+            $table->integer('from_user_id');
+            $table->integer('to_user_id');
 
             $table->timestamps();
         });

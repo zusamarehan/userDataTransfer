@@ -44,4 +44,15 @@ class User extends Authenticatable
     {
         return $this->belongsToMany('App\Project');
     }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        self::deleting(function(User $model) {
+
+            $model->projects()->detach();
+
+        });
+    }
 }

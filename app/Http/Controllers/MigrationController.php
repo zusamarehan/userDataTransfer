@@ -50,6 +50,6 @@ class MigrationController extends Controller
      */
     public function getTransferHistory() {
 
-        return UserTransferLogs::with(['fromUser', 'toUser'])->get();
+        return UserTransferLogs::get();
     }
 }
