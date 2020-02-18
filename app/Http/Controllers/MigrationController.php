@@ -44,4 +44,12 @@ class MigrationController extends Controller
         return $projectUser->load(['users']);
 
     }
+
+    /**
+     * @return Builder[]|Collection
+     */
+    public function getTransferHistory() {
+
+        return UserTransferLogs::with(['fromUser', 'toUser'])->get();
+    }
 }

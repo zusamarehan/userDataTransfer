@@ -21,3 +21,4 @@ Route::resource('projects', 'ProjectController');
 Route::post('projects/{projects}/user', 'ProjectController@addCollaborator');
 
 Route::post('/migrate', 'MigrationController@transferUserData');
+Route::get('/migrate', 'MigrationController@getTransferHistory');
