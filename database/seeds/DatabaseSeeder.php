@@ -7,7 +7,7 @@ use Faker\Generator as Faker;
 class DatabaseSeeder extends Seeder
 {
 
-    public $tables = ['users','projects'];
+    public $tables = ['users','projects', 'tasks'];
     /**
      * Seed the application's database.
      *
@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
 
          $this->call(UsersTableSeeder::class);
          $this->call(ProjectsTableSeeder::class);
+         $this->call(TaskTableSeeder::class);
 
         // pivot table
         foreach(range(1, 50) as $index)
