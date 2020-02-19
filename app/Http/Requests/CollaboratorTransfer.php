@@ -25,7 +25,7 @@ class CollaboratorTransfer extends FormRequest
     public function rules()
     {
         return [
-            'from_user_id' => ['required', new UserExists(), 'exists:project_user,user_id'],
+            'from_user_id' => ['required', 'exists:users,id'],
             'to_user_id' => ['required', 'exists:users,id']
         ];
     }
@@ -39,7 +39,7 @@ class CollaboratorTransfer extends FormRequest
     {
         return [
             'from_user_id.required' => 'The Collaborator ID to Transfer the data from is required',
-            'from_user_id.exists'  => 'Collaborator ID has no assigned Projects',
+            'from_user_id.exists'  => 'The Collaborator ID does not exists!',
 
             'to_user_id.required' => 'The Collaborator ID to Transfer the data to is required',
             'to_user_id.exists'  => 'The Collaborator ID does not exists!',

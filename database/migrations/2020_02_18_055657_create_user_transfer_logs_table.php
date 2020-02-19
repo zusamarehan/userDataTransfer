@@ -19,7 +19,9 @@ class CreateUserTransferLogsTable extends Migration
             $table->string('module', 100);
             $table->integer('module_id');
             $table->integer('from_user_id');
+            $table->string('from_user_name', 100);
             $table->integer('to_user_id');
+            $table->string('to_user_name', 100);
 
             $table->timestamps();
         });
