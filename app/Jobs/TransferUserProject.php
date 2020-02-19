@@ -5,6 +5,8 @@ namespace App\Jobs;
 use App\Project;
 use App\User;
 use App\UserTransferLogs;
+use App\UserTransferRequests;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -22,6 +24,14 @@ class TransferUserProject implements ShouldQueue
     private $toUser;
     private $fromUserName;
     private $toUserName;
+    /**
+     * @var UserTransferRequests
+     */
+    private $userTransferRequests;
+    /**
+     * @var int
+     */
+    private $projectCount;
 
     /**
      * Create a new job instance.
@@ -29,15 +39,19 @@ class TransferUserProject implements ShouldQueue
      * @param Project $project
      * @param $fromUser
      * @param $toUser
+     * @param UserTransferRequests $userTransferRequests
+     * @param int $projectCount
      */
-    public function __construct(Project $project, $fromUser, $toUser)
+    public function __construct(Project $project, $fromUser, $toUser, UserTransferRequests $userTransferRequests, int $projectCount)
     {
         //
         $this->project = $project;
         $this->fromUser = $fromUser;
         $this->toUser = $toUser;
         $this->fromUserName = $this->project->users()->where('users.id', $fromUser)->value('name');
-        $this->toUserName = $this->project->users()->where('users.id', $toUser)->value('name');
+        $this->toUserName = User::find($toUser)->name;
+        $this->userTransferRequests = $userTransferRequests;
+        $this->projectCount = $projectCount;
     }
 
     /**
@@ -50,6 +64,14 @@ class TransferUserProject implements ShouldQueue
         //
         $this->project->users()->detach($this->fromUser);
         $this->project->users()->syncWithoutDetaching($this->toUser);
+
+        // progress calculation
+        $userTransfer = UserTransferRequests::find($this->userTransferRequests->id);
+        $userTransfer->update([
+           'project_transferred' => $userTransfer->project_transferred+1,
+            'percentage' => (($userTransfer->project_transferred === 0 ? 1 : $userTransfer->project_transferred)/($this->projectCount-1))*100,
+            'end_time' => Carbon::now()
+        ]);
 
         UserTransferLogs::create([
             'module' => 'Project',

@@ -6,6 +6,7 @@ use App\Http\Requests\CollaboratorTransfer;
 use App\Jobs\TransferUserData;
 use App\Project;
 use App\UserTransferLogs;
+use App\UserTransferRequests;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -18,7 +19,9 @@ class MigrationController extends Controller
      */
     public function transferUserData(CollaboratorTransfer $request) {
 
-        TransferUserData::dispatch($request->input('from_user_id'), $request->input('to_user_id'));
+        $processRequest = UserTransferRequests::create();
+
+        TransferUserData::dispatch($request->input('from_user_id'), $request->input('to_user_id'), $processRequest);
 
         return 'Migration is in Process';
 
