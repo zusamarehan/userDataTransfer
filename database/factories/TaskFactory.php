@@ -3,6 +3,7 @@
 /** @var Factory $factory */
 
 use App\Tasks;
+use App\ProjectUser;
 use App\User;
 use App\Project;
 use Faker\Generator as Faker;
@@ -21,11 +22,14 @@ use Illuminate\Support\Str;
 */
 
 $factory->define(Tasks::class, function (Faker $faker) {
+
+    $randomProject = ProjectUser::all()->random();
+
     return [
         'title' => $faker->name,
         'desc' => $faker->unique()->safeEmail,
         'due_date' => $faker->date(),
-        'projects_id' => rand(1, Project::count()),
-        'users_id' => rand(1, User::count()),
+        'project_id' => $randomProject->project_id,
+        'user_id' => $randomProject->user_id,
     ];
 });

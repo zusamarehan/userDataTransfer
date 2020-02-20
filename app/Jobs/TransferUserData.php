@@ -45,10 +45,16 @@ class TransferUserData implements ShouldQueue
     public function handle()
     {
 
-        ProcessUserProjectTransfer::dispatch($this->fromUserID, $this->toUserID, $this->userTransferRequests);
-        ProcessUserTaskTransfer::dispatch($this->fromUserID, $this->toUserID, $this->userTransferRequests);
+        $projects = Project::with(['users'])
+            ->whereHas('users', function($query) {
+                $query->where('users.id', $this->fromUserID);
+            });
 
+        $projects->each(function ($item, $key) use ($projects){
+            TransferUserProject::dispatch($item, $this->fromUserID, $this->toUserID, $this->userTransferRequests);
+        });
 
+        EndTransferUserData::dispatch($this->userTransferRequests);
 
     }
 }

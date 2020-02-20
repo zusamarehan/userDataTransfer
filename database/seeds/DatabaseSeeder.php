@@ -25,7 +25,6 @@ class DatabaseSeeder extends Seeder
 
          $this->call(UsersTableSeeder::class);
          $this->call(ProjectsTableSeeder::class);
-         $this->call(TaskTableSeeder::class);
 
         // pivot table
         foreach(range(1, 50) as $index)
@@ -35,6 +34,10 @@ class DatabaseSeeder extends Seeder
                 'user_id' => rand(1, 10)
             ]);
         }
+
+         $this->call(TaskTableSeeder::class);
+
+
 
     }
 }

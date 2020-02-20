@@ -17,8 +17,8 @@ class CreateUserTransferRequestsTable extends Migration
             $table->bigIncrements('id');
 
             $table->integer('percentage')->default(0);
+            $table->integer('project_transfer')->default(0);
             $table->integer('project_transferred')->default(0);
-            $table->integer('task_transferred')->default(0);
             $table->timestamp('start_time')->useCurrent();
             $table->timestamp('end_time')->nullable();
 

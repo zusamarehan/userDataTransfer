@@ -19,7 +19,13 @@ class MigrationController extends Controller
      */
     public function transferUserData(CollaboratorTransfer $request) {
 
-        $processRequest = UserTransferRequests::create();
+        $projectCount = Project::with(['users'])
+            ->whereHas('users', function($query) use ($request){
+                $query->where('users.id', $request->input('from_user_id'));
+            })->count();
+
+        //store the project count
+        $processRequest = UserTransferRequests::create(['project_transfer' => $projectCount]);
 
         TransferUserData::dispatch($request->input('from_user_id'), $request->input('to_user_id'), $processRequest);
 

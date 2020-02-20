@@ -2,24 +2,31 @@
 
 namespace App\Jobs;
 
+use App\UserTransferRequests;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class ProcessUserDataTransfer implements ShouldQueue
+class EndTransferUserData implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    /**
+     * @var UserTransferRequests
+     */
+    private $userTransferRequest;
 
     /**
      * Create a new job instance.
      *
-     * @return void
+     * @param UserTransferRequests $userTransferRequest
      */
-    public function __construct()
+    public function __construct(UserTransferRequests $userTransferRequest)
     {
         //
+        $this->userTransferRequest = $userTransferRequest;
     }
 
     /**
@@ -30,5 +37,8 @@ class ProcessUserDataTransfer implements ShouldQueue
     public function handle()
     {
         //
+        $this->userTransferRequest->update([
+            'end_time' => Carbon::now()
+        ]);
     }
 }

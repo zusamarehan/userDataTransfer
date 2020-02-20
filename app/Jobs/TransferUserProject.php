@@ -20,38 +20,36 @@ class TransferUserProject implements ShouldQueue
      * @var Project
      */
     private $project;
-    private $fromUser;
-    private $toUser;
+    private $fromUserID;
+    private $toUserID;
     private $fromUserName;
     private $toUserName;
     /**
      * @var UserTransferRequests
      */
     private $userTransferRequests;
-    /**
-     * @var int
-     */
-    private $projectCount;
 
     /**
      * Create a new job instance.
      *
      * @param Project $project
-     * @param $fromUser
-     * @param $toUser
+     * @param $fromUserID
+     * @param $toUserID
      * @param UserTransferRequests $userTransferRequests
      * @param int $projectCount
      */
-    public function __construct(Project $project, $fromUser, $toUser, UserTransferRequests $userTransferRequests, int $projectCount)
+    public function __construct(Project $project, $fromUserID, $toUserID, UserTransferRequests $userTransferRequests)
     {
         //
         $this->project = $project;
-        $this->fromUser = $fromUser;
-        $this->toUser = $toUser;
-        $this->fromUserName = $this->project->users()->where('users.id', $fromUser)->value('name');
-        $this->toUserName = User::find($toUser)->name;
+
+        $this->fromUserID = $fromUserID;
+        $this->toUserID = $toUserID;
+
+        $this->fromUserName = $this->project->users()->where('users.id', $fromUserID)->value('name');
+        $this->toUserName = User::find($toUserID)->name;
+
         $this->userTransferRequests = $userTransferRequests;
-        $this->projectCount = $projectCount;
     }
 
     /**
@@ -61,24 +59,25 @@ class TransferUserProject implements ShouldQueue
      */
     public function handle()
     {
-        //
-        $this->project->users()->detach($this->fromUser);
-        $this->project->users()->syncWithoutDetaching($this->toUser);
+        // Project Transfer
+        $this->project->users()->detach($this->fromUserID);
+        $this->project->users()->syncWithoutDetaching($this->toUserID);
+        // Project Task Transfer
+        $this->project->tasks()->where('tasks.user_id', $this->fromUserID)->update(['tasks.user_id' => $this->toUserID]);
 
-        // progress calculation
-        $userTransfer = UserTransferRequests::find($this->userTransferRequests->id);
-        $userTransfer->update([
-           'project_transferred' => $userTransfer->project_transferred+1,
-            'percentage' => (($userTransfer->project_transferred === 0 ? 1 : $userTransfer->project_transferred)/($this->projectCount-1)) * 50,
-            'end_time' => Carbon::now()
+        // Transfer Progress Calculation
+        $this->userTransferRequests->update([
+            'project_transferred' => $this->userTransferRequests->project_transferred+1,
+            'percentage' => (($this->userTransferRequests->project_transferred+1)/$this->userTransferRequests->project_transfer) * 100,
         ]);
 
+        // Transfer Logs
         UserTransferLogs::create([
             'module' => 'Project',
             'module_id' => $this->project->id,
-            'from_user_id' => $this->fromUser,
+            'from_user_id' => $this->fromUserID,
             'from_user_name' => $this->fromUserName,
-            'to_user_id' => $this->toUser,
+            'to_user_id' => $this->toUserID,
             'to_user_name' => $this->toUserName
         ]);
     }
